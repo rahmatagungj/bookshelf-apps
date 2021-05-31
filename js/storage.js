@@ -62,7 +62,7 @@ function reloadRefreshBook() {
   let listCompleted = document.getElementById(completeListBook);
 
   for (book of books) {
-    const bukuBaru = membuatShelfBook(
+    const bukuBaru = makeShelfBook(
       book.title,
       book.author,
       book.year,

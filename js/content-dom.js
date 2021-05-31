@@ -7,32 +7,31 @@ const btnCancel = document.getElementById("batal");
 const modalCustom = document.getElementById("myModal");
 const modalEdit = document.getElementById("modalEdit");
 
-function tambahBuku() {
-  const belumBook = document.getElementById(notCompleteListBook);
-  const sudahBook = document.getElementById(completeListBook);
+function addBook() {
+  const notCompleteBook = document.getElementById(notCompleteListBook);
+  const completeBook = document.getElementById(completeListBook);
   const titleBook = document.getElementById("title").value;
   const authorBook = document.getElementById("author").value;
   const yearBook = document.getElementById("year").value;
   const isCompleted = document.getElementById("check").checked;
-  const membuatBook = membuatShelfBook(
+  const detailsBook = makeShelfBook(
     titleBook,
     authorBook,
     yearBook,
     isCompleted
   );
-  if (isCompleted === true) {
-    sudahBook.append(membuatBook);
+  if (isCompleted !== false) {
+    completeBook.append(detailsBook);
   } else {
-    belumBook.append(membuatBook);
+    notCompleteBook.append(detailsBook);
   }
   const bookData = bukuData(titleBook, authorBook, yearBook, isCompleted);
-  membuatBook[bookId] = bookData.id;
+  detailsBook[bookId] = bookData.id;
   books.push(bookData);
-
   updateStorage();
 }
 
-function membuatShelfBook(title, author, year, isCompleted) {
+function makeShelfBook(title, author, year, isCompleted) {
   const titleBook = document.createElement("p");
   titleBook.innerText = title;
   titleBook.classList.add("title-buku");
@@ -48,52 +47,52 @@ function membuatShelfBook(title, author, year, isCompleted) {
   container.append(titleBook, authorBook, yearBook);
   if (isCompleted === true) {
     diviers.classList.add("divier-done");
-    container.append(btnSelesai(), btnEdit(), btnHapus(), diviers);
+    container.append(btnDone(), btnEdit(), btnDelete(), diviers);
   } else {
     diviers.classList.add("divier");
-    container.append(btnBelum(), btnEdit(), btnHapus(), diviers);
+    container.append(btnNotComplete(), btnEdit(), btnDelete(), diviers);
   }
 
   return container;
 }
 
-function tambahBukuSelesai(elementBook) {
-  const bukuSelesai = document.getElementById(completeListBook);
+function setBookDone(elementBook) {
+  const bookCompleted = document.getElementById(completeListBook);
   const titleBook = elementBook.querySelector(".title-buku").innerText;
   const authorBook = elementBook.querySelector(".author-buku").innerText;
   const yearBook = elementBook.querySelector(".year-buku").innerText;
-  const bookBaru = membuatShelfBook(titleBook, authorBook, yearBook, true);
+  const newBook = makeShelfBook(titleBook, authorBook, yearBook, true);
   const bookData = findBook(elementBook[bookId]);
   bookData.isCompleted = true;
-  bookBaru[bookId] = bookData.id;
+  newBook[bookId] = bookData.id;
 
-  bukuSelesai.append(bookBaru);
+  bookCompleted.append(newBook);
   elementBook.remove();
   updateStorage();
 }
 
-function bukuBelumSelesai(elementBook) {
-  const belumSelesai = document.getElementById(notCompleteListBook);
+function bookNotComplete(elementBook) {
+  const bookNotComplete = document.getElementById(notCompleteListBook);
   const titleBook = elementBook.querySelector(".title-buku").innerText;
   const authorBook = elementBook.querySelector(".author-buku").innerText;
   const yearBook = elementBook.querySelector(".year-buku").innerText;
-  const bookBaru = membuatShelfBook(titleBook, authorBook, yearBook, false);
+  const newBook = makeShelfBook(titleBook, authorBook, yearBook, false);
   const bookData = findBook(elementBook[bookId]);
   bookData.isCompleted = false;
-  bookBaru[bookId] = bookData.id;
-  belumSelesai.append(bookBaru);
+  newBook[bookId] = bookData.id;
+  bookNotComplete.append(newBook);
   elementBook.remove();
   updateStorage();
 }
 
 function editBuku(elementBook) {
-  const belumBook = document.getElementById(notCompleteListBook);
-  const sudahBook = document.getElementById(completeListBook);
+  const notCompleteBook = document.getElementById(notCompleteListBook);
+  const completeBook = document.getElementById(completeListBook);
   const titleBook = document.getElementById("title-edit").value;
   const authorBook = document.getElementById("author-edit").value;
   const yearBook = document.getElementById("year-edit").value;
   const isCompleted = document.getElementById("check-edit").checked;
-  const membuatBook = membuatShelfBook(
+  const detailsBook = makeShelfBook(
     titleBook,
     authorBook,
     yearBook,
@@ -106,16 +105,16 @@ function editBuku(elementBook) {
   bookData.isCompleted = isCompleted;
   if (isCompleted === true) {
     elementBook.remove();
-    sudahBook.append(membuatBook);
+    completeBook.append(detailsBook);
   } else {
     elementBook.remove();
-    belumBook.append(membuatBook);
+    notCompleteBook.append(detailsBook);
   }
   // elementBook.remove();
   updateStorage();
 }
 
-function buatBtn(title, classType, eventListener) {
+function makeBtn(title, classType, eventListener) {
   const button = document.createElement("button");
   button.innerText = title;
   button.classList.add(classType);
@@ -133,14 +132,14 @@ function removeFromShelf(book) {
   updateStorage();
 }
 
-function btnBelum() {
-  return buatBtn("Selesai", "btn-done", function (event) {
-    tambahBukuSelesai(event.target.parentElement);
+function btnNotComplete() {
+  return makeBtn("Selesai", "btn-done", function (event) {
+    setBookDone(event.target.parentElement);
   });
 }
 
 function btnEdit() {
-  return buatBtn("Edit", "btn-edit", function (event) {
+  return makeBtn("Edit", "btn-edit", function (event) {
     const editForm = document.getElementById("form-edit");
     const targetElement = event.target.parentElement.children;
     modalEdit.style.display = "block";
@@ -159,8 +158,8 @@ function btnEdit() {
   });
 }
 
-function btnHapus() {
-  return buatBtn("Hapus", "btn-hapus", function (event) {
+function btnDelete() {
+  return makeBtn("Hapus", "btn-hapus", function (event) {
     modalCustom.style.display = "block";
     btnYes.onclick = () => {
       removeFromShelf(event.target.parentElement);
@@ -169,9 +168,9 @@ function btnHapus() {
   });
 }
 
-function btnSelesai() {
-  return buatBtn("Belum Selesai", "btn-done", function (event) {
-    bukuBelumSelesai(event.target.parentElement);
+function btnDone() {
+  return makeBtn("Belum Selesai", "btn-done", function (event) {
+    bookNotComplete(event.target.parentElement);
   });
 }
 
